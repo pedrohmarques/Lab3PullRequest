@@ -72,8 +72,8 @@ class PullRequest:
 
     def get_pullrequest_available(self, pullrequest):
         if pullrequest['reviews']['totalCount'] > 0:
-            created_at = pullrequest['reviews']['nodes'][0]['createdAt']
-            merged_at = pullrequest['reviews']['nodes'][0]['publishedAt']
+            created_at = pullrequest['createdAt']
+            merged_at = pullrequest['closedAt']
 
             created_at = datetime.strptime(created_at[0:10] + ' ' + created_at[11:16], '%Y-%m-%d %H:%M')
             merged_at = datetime.strptime(merged_at[0:10] + ' ' + merged_at[11:16], '%Y-%m-%d %H:%M')
@@ -88,6 +88,22 @@ class PullRequest:
                 return True
         else:
             return False
+
+    def update_json_to_csv(self, pullrequest_availabled):
+        for repo in pullrequest_availabled:
+            total_changes = self.sum_files_changes(repo['files'])
+            repo['files']['total_Additions'] = total_changes['additions']
+            repo['files']['total_Deletions'] = total_changes['deletions']
+            del repo['files']['nodes']
+
+    def sum_files_changes(self, data):
+        addition = 0
+        deletions = 0
+        for node in data['nodes']:
+            addition = addition + node['additions']
+            deletions = deletions + node['deletions']
+        
+        return { "additions": addition, "deletions": deletions }
             
     def get_pullrequests(self):
         pullrequests_merged = self.get_pullrequests_git('MERGED')
@@ -106,4 +122,8 @@ class PullRequest:
             if is_available:
                 pullrequest_availabled.append(pullrequest_closed)
         
+
+        self.update_json_to_csv(pullrequest_availabled)
         return pullrequest_availabled
+    
+    

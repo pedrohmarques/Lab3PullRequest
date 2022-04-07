@@ -1,0 +1,65 @@
+[
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkyODQ1NzgyMw==",
+      "name": "freeCodeCamp",
+      "nameWithOwner": "freeCodeCamp/freeCodeCamp",
+      "stargazers": {
+        "totalCount": 343556
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkxNzc3MzY1MzM=",
+      "name": "996.ICU",
+      "nameWithOwner": "996icu/996.ICU",
+      "stargazers": {
+        "totalCount": 261652
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkxMzQ5MTg5NQ==",
+      "name": "free-programming-books",
+      "nameWithOwner": "EbookFoundation/free-programming-books",
+      "stargazers": {
+        "totalCount": 229721
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkyMTczNzQ2NQ==",
+      "name": "awesome",
+      "nameWithOwner": "sindresorhus/awesome",
+      "stargazers": {
+        "totalCount": 196061
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkxMTczMDM0Mg==",
+      "name": "vue",
+      "nameWithOwner": "vuejs/vue",
+      "stargazers": {
+        "totalCount": 194710
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnk1NDM0Njc5OQ==",
+      "name": "public-apis",
+      "nameWithOwner": "public-apis/public-apis",
+      "stargazers": {
+        "totalCount": 187783
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnkxMDI3MDI1MA==",
+      "name": "react",
+      "nameWithOwner": "facebook/react",
+      "stargazers": {
+        "totalCount": 185867
+      }
+    },
+    {
+      "id": "MDEwOlJlcG9zaXRvcnk0NTcxNzI1MA==",
+      "name": "tensorflow",
+      "nameWithOwner": "tensorflow/tensorflow",
+      "stargazers": {
+        "totalCount": 164059
+      }
+    }]
