@@ -5,13 +5,22 @@ import requests
 
 class PullRequest:
     def __init__(self, token):
-        self.token = token
+        self.number_token = 0
+        self.tokens = token
+        self.next_Token()
 
-    def __get_query_pullrequests(self, owner, name, type):
+    def next_Token(self):
+        if self.number_token == len(self.tokens):
+            print('ACABOU OS TOKEN')
+        else:
+            self.token = self.tokens[self.number_token]
+            self.number_token = self.number_token + 1
+
+    def __get_query_pullrequests(self, owner, name, after, state):
         query = f"""
             {{
                 repository(owner: "{owner}", name: "{name}") {{
-                    REQUEST: pullRequests(states: {type}, last: 50) {{
+                    REQUEST: pullRequests(states: {state}, first: 100, {after}) {{
                         pageInfo {{
                             endCursor
                             hasNextPage
@@ -20,14 +29,14 @@ class PullRequest:
                             createdAt
                             closedAt
                             state
-                            bodyText
+                            body
                             participants {{
                                 totalCount
                             }}
                             comments {{
                                 totalCount
                             }}
-                            files(last: 10) {{
+                            files(first: 10) {{
                                 totalCount
                                 nodes {{
                                     additions
@@ -38,12 +47,10 @@ class PullRequest:
                                 additions
                                 deletions
                             }}
-                            reviews(states: APPROVED, last: 10) {{
+                            reviews(states: APPROVED, first: 10) {{
                                 totalCount
                                 nodes {{
-                                    createdAt
-                                    publishedAt
-                                    bodyText
+                                    body
                                 }}
                             }}
                         }}
@@ -53,22 +60,46 @@ class PullRequest:
             """
         return query
 
-    def get_pullrequests_git(self, type):
-        headers = headers = {'Authorization': f'Bearer {self.token}'}
+    def get_pullrequests_git(self, state):
         res = []
+        hasNextPage = True
+        after = 'after: null'
+        teste = 0
 
         with open('repositories.json', "r") as file:
             reader = json.load(file)
-            for data in reader:
-                owner_name = data['nameWithOwner'].split('/')
-                query = self.__get_query_pullrequests(owner_name[0], owner_name[1], type)
-                result = requests.post("https://api.github.com/graphql", json={'query': query}, headers=headers)
-                if result.status_code == 200:
-                    data = result.json()['data']['repository']['REQUEST']
-                    pullrequests = list(map(lambda x: x, data['nodes']))
-                    res = res + pullrequests
-
+            data = reader[0]
+            #for data in reader:
+            owner_name = data['nameWithOwner'].split('/')
+            
+            while hasNextPage:
+                teste = teste + 1
+                response = self.get_request(owner_name[0], owner_name[1], after, state)
+                if response.status_code == 200:
+                    pageInfo = response.json()['data']['repository']['REQUEST']['pageInfo']
+                    res = self.increment_result(response, res)
+                    hasNextPage = pageInfo['hasNextPage']
+                    after = f"""after: "{ pageInfo['endCursor'] }" """
+                else:
+                    print(response.status_code)
+                    if response.status_code == 500:
+                        self.next_Token()
+                print(teste)
+        
         return res
+
+    def get_request(self, owner, name, after, state):
+        headers = headers = {'Authorization': f'Bearer {self.token}'}
+        query = self.__get_query_pullrequests(owner, name, after, state)
+        result = requests.post("https://api.github.com/graphql", json={'query': query}, headers=headers)
+
+        return result
+
+    def increment_result(self, response, result):
+        data = response.json()['data']['repository']['REQUEST']
+        pullrequests = list(map(lambda x: x, data['nodes']))
+        
+        return result + pullrequests
 
     def get_pullrequest_available(self, pullrequest):
         if pullrequest['reviews']['totalCount'] > 0:
@@ -108,21 +139,22 @@ class PullRequest:
     def get_pullrequests(self):
         pullrequests_merged = self.get_pullrequests_git('MERGED')
         JsonConvert('pull_request_MERGED.json').update(pullrequests_merged)
-        pullrequests_closed = self.get_pullrequests_git('CLOSED')
-        JsonConvert('pull_request_CLOSED.json').update(pullrequests_closed)
+
+        ''' pullrequests_closed = self.get_pullrequests_git('CLOSED')
+        JsonConvert('pull_request_CLOSED.json').update(pullrequests_closed)'''
+
         pullrequest_availabled = []
 
         for pullrequest_merged in pullrequests_merged:
             is_available = self.get_pullrequest_available(pullrequest_merged)
             if is_available:
                 pullrequest_availabled.append(pullrequest_merged)
-
-        for pullrequest_closed in pullrequests_closed:
+        
+        '''for pullrequest_closed in pullrequests_closed:
             is_available = self.get_pullrequest_available(pullrequest_closed)
             if is_available:
-                pullrequest_availabled.append(pullrequest_closed)
-        
-
+                pullrequest_availabled.append(pullrequest_closed)'''
+      
         self.update_json_to_csv(pullrequest_availabled)
         return pullrequest_availabled
     

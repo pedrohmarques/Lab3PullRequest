@@ -65,7 +65,7 @@ class Repository:
             data = result.json()['data']['repository']
             total_merged_closed = data['MERGED_REQUEST']['totalCount'] + data['CLOSED_REQUEST']['totalCount']
             
-            if (total_merged_closed < 1000):
+            if (total_merged_closed < 100):
                 return False
             else:
                 return True
