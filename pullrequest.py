@@ -64,27 +64,28 @@ class PullRequest:
         res = []
         hasNextPage = True
         after = 'after: null'
-        teste = 0
 
         with open('repositories.json', "r") as file:
             reader = json.load(file)
             data = reader[0]
-            #for data in reader:
-            owner_name = data['nameWithOwner'].split('/')
             
-            while hasNextPage:
-                teste = teste + 1
-                response = self.get_request(owner_name[0], owner_name[1], after, state)
-                if response.status_code == 200:
-                    pageInfo = response.json()['data']['repository']['REQUEST']['pageInfo']
-                    res = self.increment_result(response, res)
-                    hasNextPage = pageInfo['hasNextPage']
-                    after = f"""after: "{ pageInfo['endCursor'] }" """
-                else:
-                    print(response.status_code)
-                    if response.status_code == 500:
-                        self.next_Token()
-                print(teste)
+            for data in reader:
+                owner_name = data['nameWithOwner'].split('/')
+                
+                while hasNextPage:
+                    try:
+                        response = self.get_request(owner_name[0], owner_name[1], after, state)
+                        if response.status_code == 200:
+                            pageInfo = response.json()['data']['repository']['REQUEST']['pageInfo']
+                            res = self.increment_result(response, res)
+                            hasNextPage = pageInfo['hasNextPage']
+                            after = f"""after: "{ pageInfo['endCursor'] }" """
+                        else:
+                            print(response.status_code)
+                            if response.status_code == 500:
+                                self.next_Token()
+                    except Exception as ex:
+                        print(ex)
         
         return res
 
@@ -140,8 +141,8 @@ class PullRequest:
         pullrequests_merged = self.get_pullrequests_git('MERGED')
         JsonConvert('pull_request_MERGED.json').update(pullrequests_merged)
 
-        ''' pullrequests_closed = self.get_pullrequests_git('CLOSED')
-        JsonConvert('pull_request_CLOSED.json').update(pullrequests_closed)'''
+        pullrequests_closed = self.get_pullrequests_git('CLOSED')
+        JsonConvert('pull_request_CLOSED.json').update(pullrequests_closed)
 
         pullrequest_availabled = []
 
@@ -150,12 +151,10 @@ class PullRequest:
             if is_available:
                 pullrequest_availabled.append(pullrequest_merged)
         
-        '''for pullrequest_closed in pullrequests_closed:
+        for pullrequest_closed in pullrequests_closed:
             is_available = self.get_pullrequest_available(pullrequest_closed)
             if is_available:
-                pullrequest_availabled.append(pullrequest_closed)'''
+                pullrequest_availabled.append(pullrequest_closed)
       
         self.update_json_to_csv(pullrequest_availabled)
         return pullrequest_availabled
-    
-    
