@@ -80,6 +80,7 @@ class PullRequest:
                             res = self.increment_result(response, res)
                             hasNextPage = pageInfo['hasNextPage']
                             after = f"""after: "{ pageInfo['endCursor'] }" """
+                            print("################## PR OK #################")
                         else:
                             print(response.status_code)
                             if response.status_code == 500:
@@ -140,9 +141,11 @@ class PullRequest:
     def get_pullrequests(self):
         pullrequests_merged = self.get_pullrequests_git('MERGED')
         JsonConvert('pull_request_MERGED.json').update(pullrequests_merged)
+        print("################## PR MERGED FINALIZADO #################")
 
         pullrequests_closed = self.get_pullrequests_git('CLOSED')
         JsonConvert('pull_request_CLOSED.json').update(pullrequests_closed)
+        print("################## PR CLOSED FINALIZADO #################")
 
         pullrequest_availabled = []
 
