@@ -17,7 +17,8 @@ if op == '1':
     JsonConvert('repositories.json').update(repositories)
     exportDataToCsv('repositories.json', 'repositories.csv')
 elif op == '2':
-    pullrequest = PullRequest(["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"])
+    pullrequest = PullRequest(["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", "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", "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",
+        "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", "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"])
     print("Get Pull Requests")
     pull_requests = pullrequest.get_pullrequests()
     JsonConvert('pull_request.json').update(pull_requests)
