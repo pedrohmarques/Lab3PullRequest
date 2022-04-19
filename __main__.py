@@ -23,3 +23,5 @@ elif op == '2':
     pull_requests = pullrequest.get_pullrequests()
     JsonConvert('pull_request.json').update(pull_requests)
     exportDataToCsv('pull_request.json', 'pull_request.csv')
+elif op == '3':
+    exportDataToCsv('pull_request.json', 'pull_request.csv')
